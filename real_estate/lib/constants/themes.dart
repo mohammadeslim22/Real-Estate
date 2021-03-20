@@ -6,7 +6,7 @@ ThemeData mainThemeData() {
     primaryColor: colors.orange,
     primaryTextTheme: const TextTheme(),
     scaffoldBackgroundColor: colors.grey,
-    accentColor: colors.orange,
+    accentColor: colors.blue,
     appBarTheme: AppBarTheme(
         color: colors.grey,
         elevation: 0.0,
@@ -36,7 +36,7 @@ ThemeData mainThemeDatadark() {
     ),
     fontFamily: "Almarai",
     canvasColor: const Color(0xFF666666),
-    cursorColor: colors.orange,
+    cursorColor: colors.blue,
     hintColor: colors.black,
     // bottomSheetTheme:  BottomSheetThemeData(elevation: 10,backgroundColor: Colors.white.withOpacity(.75)),
     textTheme: TextTheme(
