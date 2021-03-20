@@ -13,7 +13,7 @@ class Config {
   String countryCode = '+970';
 
   final TextEditingController locationController = TextEditingController();
-  bool loggedin = true;
+  bool loggedin = false;
   Locale userLnag;
   Address first;
   Coordinates coordinates;

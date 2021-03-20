@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:real_estate/constants/config.dart';
 import 'package:real_estate/constants/styles.dart';
+import 'package:real_estate/data_base/DBhelper.dart';
 import 'package:real_estate/providers/mainprovider.dart';
 import 'package:real_estate/providers/auth.dart';
 import 'package:real_estate/ui/widgets/countryCodePicker.dart';
@@ -34,7 +35,6 @@ class _MyRegistrationState extends State<Registration>
   DateTime firstDate = DateTime(today.year - 90, today.month, today.day);
   DateTime lastDate = DateTime(today.year - 18, today.month, today.day);
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   @override
   void initState() {
     super.initState();
@@ -95,35 +95,21 @@ class _MyRegistrationState extends State<Registration>
                     }
                     return auth.regValidationMap['name'];
                   }),
-                   TextFormInput(
-                  text: "كلمة المرور",
-                  cController: passwordController,
-                  prefixIcon: Icons.lock_outline,
-                  kt: TextInputType.visiblePassword,
+              TextFormInput(
+                  text: "الهاتف",
+                  cController: mobileNoController,
+                  prefixIcon: Icons.phone,
+                  kt: TextInputType.phone,
                   readOnly: false,
                   onTab: () {},
-                  suffixicon: IconButton(
-                    icon: Icon(
-                      (_obscureText == false)
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: colors.orange,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  ),
                   obscureText: _obscureText,
                   focusNode: focus2,
                   validator: (String value) {
-                    if (passwordController.text.length < 6) {
-                      return "كلمة المرور يحب أن تكون اطول من 6 أحرف";
+                    if (mobileNoController.text.length < 6) {
+                      return "أدخل رقم هاتف صحيح";
                     }
-                    return auth.regValidationMap['password'];
+                    return auth.regValidationMap['mobile'];
                   }),
-              // 0595388810
               TextFormInput(
                   text: "البريد الإلكتروني",
                   cController: emailController,
@@ -144,7 +130,6 @@ class _MyRegistrationState extends State<Registration>
                     }
                     return auth.regValidationMap['email'];
                   }),
-         
               TextFormInput(
                   text: "كلمة المرور",
                   cController: passwordController,
@@ -157,7 +142,7 @@ class _MyRegistrationState extends State<Registration>
                       (_obscureText == false)
                           ? Icons.visibility
                           : Icons.visibility_off,
-                      color: colors.orange,
+                      color: colors.blue,
                     ),
                     onPressed: () {
                       setState(() {
@@ -166,14 +151,13 @@ class _MyRegistrationState extends State<Registration>
                     },
                   ),
                   obscureText: _obscureText,
-                  focusNode: focus2,
+                  focusNode: focus3,
                   validator: (String value) {
                     if (passwordController.text.length < 6) {
                       return "كلمة المرور يحب أن تكون اطول من 6 أحرف";
                     }
                     return auth.regValidationMap['password'];
                   }),
-          
               TextFormInput(
                   text: "ادخل الموقع",
                   cController: config.locationController,
@@ -192,8 +176,7 @@ class _MyRegistrationState extends State<Registration>
 
                         Scaffold.of(context).showSnackBar(snackBar);
                         setState(() {
-                          config.locationController.text =
-                             "اضغط لتحديد عنوانك";
+                          config.locationController.text = "اضغط لتحديد عنوانك";
                         });
                       }
                     } catch (e) {
@@ -201,13 +184,12 @@ class _MyRegistrationState extends State<Registration>
                       mainProvider.togelocationloading(false);
                       Scaffold.of(context).showSnackBar(snackBar);
                       setState(() {
-                        config.locationController.text =
-                            "اضغط لتحديد عنوانك";
+                        config.locationController.text = "اضغط لتحديد عنوانك";
                       });
                     }
                   },
                   suffixicon: IconButton(
-                    icon: const Icon(Icons.add_location, color: Colors.orange),
+                    icon: const Icon(Icons.add_location, color: Colors.blue),
                     onPressed: () {
                       Navigator.pushNamed(context, '/AutoLocate',
                           arguments: <String, double>{
@@ -267,7 +249,7 @@ class _MyRegistrationState extends State<Registration>
                     child: RaisedButton(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18.0),
-                            side: BorderSide(color: colors.orange)),
+                            side: BorderSide(color: colors.blue)),
                         onPressed: () async {
                           if (_isButtonEnabled) {
                             if (_formKey.currentState.validate()) {
@@ -292,16 +274,16 @@ class _MyRegistrationState extends State<Registration>
                                 return null;
                               });
                             }
+                            mainProvider.togelf(false);
                             setState(() {
-                              print("fuck u all");
                               _isButtonEnabled = true;
                             });
                           }
+                          Navigator.popAndPushNamed(context, "/login");
                         },
-                        color: colors.orange,
+                        color: colors.blue,
                         textColor: colors.white,
-                        child: mainProvider
-                            .returnchild("تسجيل")),
+                        child: mainProvider.returnchild("تسجيل")),
                   ),
                   const Padding(
                       padding: EdgeInsets.fromLTRB(30, 0, 30, 10),
@@ -316,7 +298,7 @@ class _MyRegistrationState extends State<Registration>
                         ),
                       ),
                       ButtonToUse(
-                       "الدعم الفني",
+                        "الدعم الفني",
                         fontWait: FontWeight.bold,
                         fontColors: Colors.green,
                       ),

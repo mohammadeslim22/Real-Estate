@@ -5,13 +5,10 @@ import 'package:real_estate/providers/auth.dart';
 import 'package:real_estate/providers/mainprovider.dart';
 import 'package:real_estate/ui/widgets/countryCodePicker.dart';
 import 'package:real_estate/ui/widgets/text_form_input.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:real_estate/constants/colors.dart';
 import 'package:real_estate/constants/styles.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../widgets/text_form_input.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/svg.dart';
 import '../widgets/buttonTouse.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -59,13 +56,13 @@ class _MyLoginScreenState extends State<LoginScreen>
               },
               validator: (String value) {
                 if (value.isEmpty) {
-                  return "trans(context, 'p_enter_u_mobile')";
+                  return "أدخل رقم هاتف صحيح";
                 }
                 return auht.loginValidationMap['phone'];
               },
             ),
             TextFormInput(
-              text: "trans(context, 'password')",
+              text: "كلمة المرور",
               cController: _passwordController,
               prefixIcon: Icons.lock_outline,
               kt: TextInputType.visiblePassword,
@@ -89,7 +86,7 @@ class _MyLoginScreenState extends State<LoginScreen>
               focusNode: _focus1,
               validator: (String value) {
                 if (value.isEmpty) {
-                  return "trans(context, 'p_enter_password')";
+                  return "أدخل كلمة المرور من فضلك";
                 }
                 return auht.loginValidationMap['password'];
               },
@@ -123,18 +120,15 @@ class _MyLoginScreenState extends State<LoginScreen>
               children: <Widget>[
                 Text("عودة إلى الشاشة الرئيسية"),
                 const SizedBox(width: 16),
-                Icon(Icons.keyboard_return, color: colors.orange)
+                Icon(Icons.keyboard_return, color: colors.blue)
               ],
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(16),
-          child: SvgPicture.asset(
-            "assets/images/Layer.svg",
-            width: 120.0,
-            height: 120.0,
-          ),
+          child: Image.asset("assets/images/logo.jpg",
+              width: 120.0, height: 120.0),
         ),
         Consumer<Auth>(
           builder: (BuildContext context, Auth auth, Widget child) {
@@ -160,7 +154,7 @@ class _MyLoginScreenState extends State<LoginScreen>
                   child: RaisedButton(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
-                          side: BorderSide(color: colors.orange)),
+                          side: BorderSide(color: colors.blue)),
                       onPressed: () async {
                         print(
                             "_usernameController.text : ${_usernameController.text}");
@@ -172,6 +166,7 @@ class _MyLoginScreenState extends State<LoginScreen>
                             });
                             if (await auth.login(_usernameController.text,
                                 _passwordController.text, context)) {
+                              Navigator.popAndPushNamed(context, "/Account");
                             } else {
                               _formKey.currentState.validate();
                             }
@@ -186,7 +181,7 @@ class _MyLoginScreenState extends State<LoginScreen>
                           }
                         }
                       },
-                      color: colors.orange,
+                      color: colors.blue,
                       textColor: colors.white,
                       child: mainProvider.returnchild("تسجيل دخول")),
                 ),

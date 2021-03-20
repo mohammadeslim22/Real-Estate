@@ -1,16 +1,17 @@
 import 'dart:async';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
-import 'package:real_estate/constants/colors.dart';
-import 'package:real_estate/constants/styles.dart';
+import 'package:real_estate/constants/config.dart';
+import 'package:real_estate/data_base/DBhelper.dart';
 import 'package:real_estate/helpers/data.dart';
+import 'package:real_estate/models/User.dart';
 import 'package:real_estate/providers/mainprovider.dart';
 import 'package:real_estate/services/navigationService.dart';
 import 'package:real_estate/helpers/service_locator.dart';
 import 'package:country_provider/country_provider.dart';
 
 class Auth with ChangeNotifier {
+  DBHelper databaseHelper = DBHelper();
+
   Auth() {
     // TODO(ahmed): do login by dio library
   }
@@ -102,11 +103,12 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> login(String username, String pass, BuildContext context) async {
-
+  Future<bool> login(String phone, String pass, BuildContext context) async {
+    await data.setData("loggedin", "true");
+    return await databaseHelper.readUser(phone, pass);
   }
 
-  Future<bool> register(
+  Future<void> register(
     BuildContext context,
     MainProvider mainProv,
     String username,
@@ -115,7 +117,8 @@ class Auth with ChangeNotifier {
     String email,
     String mobile,
   ) async {
-
+    await databaseHelper
+        .adduser(User(email, username, mobile, pass, config.long, config.lat));
   }
 
   Map<String, dynamic> user;
@@ -137,8 +140,7 @@ class Auth with ChangeNotifier {
   void signInAnonymously() {}
 
   Future<void> signOut() async {
-    await data.setData('authorization', null);  
+    await data.setData('authorization', null);
     getIt<NavigationService>().navigateTo('/login', null);
   }
-
 }
