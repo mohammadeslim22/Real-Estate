@@ -262,7 +262,6 @@ class _MyRegistrationState extends State<Registration>
                                 mainProvider,
                                 usernameController.text,
                                 passwordController.text,
-                                birthDateController.text,
                                 emailController.text,
                                 mobileNoController.text,
                               );
@@ -273,13 +272,13 @@ class _MyRegistrationState extends State<Registration>
                                   .updateAll((String key, String value) {
                                 return null;
                               });
+                              Navigator.popAndPushNamed(context, "/login");
                             }
                             mainProvider.togelf(false);
                             setState(() {
                               _isButtonEnabled = true;
                             });
                           }
-                          Navigator.popAndPushNamed(context, "/login");
                         },
                         color: colors.blue,
                         textColor: colors.white,

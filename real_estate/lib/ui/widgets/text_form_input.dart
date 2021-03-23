@@ -20,7 +20,8 @@ class TextFormInput extends StatelessWidget {
       this.focusNode,
       this.nextfocusNode,
       this.onFieldSubmitted,
-      this.validator})
+      this.validator,
+      })
       : super(key: key);
   final String text;
   final TextEditingController cController;
@@ -35,19 +36,18 @@ class TextFormInput extends StatelessWidget {
   final FocusNode nextfocusNode;
   final Function onFieldSubmitted;
   final String Function(String error) validator;
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
       child: TextFormField(
-        readOnly: readOnly??false,
+        readOnly: readOnly ?? false,
         keyboardType: kt,
         onTap: () => onTab(),
         controller: cController,
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 15,
-        ),
+        style: const TextStyle(color: Colors.black, fontSize: 15),
+       
         obscureText: obscureText,
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
@@ -62,9 +62,7 @@ class TextFormInput extends StatelessWidget {
               fontSize: 15,
             ),
             disabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-              color: Colors.grey,
-            )),
+                borderSide: BorderSide(color: Colors.grey)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7),
             ),
@@ -78,10 +76,8 @@ class TextFormInput extends StatelessWidget {
         onFieldSubmitted: (String v) {
           onFieldSubmitted();
         },
-        validator: (
-          String error
-        ) {
-         return  validator( error);
+        validator: (String error) {
+          return validator(error);
         },
       ),
     );

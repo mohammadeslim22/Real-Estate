@@ -4,6 +4,9 @@ import 'package:real_estate/constants/config.dart';
 import 'package:real_estate/constants/themes.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:real_estate/data_base/DBhelper.dart';
+import 'package:real_estate/providers/location_provider.dart';
+import 'package:real_estate/providers/property_provider.dart';
+import 'package:real_estate/services/navigationService.dart';
 import 'constants/colors.dart';
 import 'constants/route.dart';
 import 'helpers/data.dart';
@@ -29,10 +32,12 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: <ChangeNotifierProvider<ChangeNotifier>>[
-        ChangeNotifierProvider<Auth>.value(
-          value: getIt<Auth>(),
-        ),
+        ChangeNotifierProvider<Auth>.value(value: getIt<Auth>()),
         ChangeNotifierProvider<MainProvider>(create: (_) => MainProvider()),
+        ChangeNotifierProvider<PropertiesProvider>(
+            create: (_) => PropertiesProvider()),
+        ChangeNotifierProvider<LocationProvider>(
+            create: (_) => LocationProvider()),
       ],
       child: MyApp(),
     ),
@@ -43,6 +48,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: getIt<NavigationService>().navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: mainThemeData(),
@@ -94,18 +100,17 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.person_outline),
-            onPressed: () {
+            onPressed: () async {
+              List<User> users = await databaseHelper.readAllUsers();
+              users.forEach((user) => {
+                    print(
+                        "user.id ${user.id} user.phone ${user.phones} user.pass ${user.password} user.latitude ${user.latitude} user.longitude ${user.longitude}")
+                  });
               print("config.loggedin ${config.loggedin}");
               if (config.loggedin) {
-                Navigator.popAndPushNamed(context, "/Account");
+                Navigator.pushNamed(context, "/Account");
               } else {
-                databaseHelper.readAllUsers().then((List<User> users) => {
-                      users.forEach((user) => {
-                            print(
-                                "user.id ${user.id} user.phone ${user.phones} user.pass ${user.password} user.latitude ${user.latitude} user.longitude ${user.longitude}")
-                          })
-                    });
-                Navigator.pushNamed(context, "/login");
+                Navigator.popAndPushNamed(context, "/login");
               }
             },
           ),
@@ -228,7 +233,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text("أنشطتي",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
               ])),
-          Padding(
+          InkWell(
+              child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -238,9 +244,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 Icon(Icons.star, size: 36)
               ],
             ),
-          ),
+          )),
           Divider(),
-          Padding(
+          InkWell(
+              child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -250,6 +257,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 Icon(Icons.favorite, size: 36)
               ],
             ),
+          )),
+          InkWell(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text("عقاراتي", style: TextStyle(fontSize: 24)),
+                  const SizedBox(width: 24),
+                  Icon(Icons.home, size: 36)
+                ],
+              ),
+            ),
+            onTap: () {},
           ),
           Divider(),
           // Padding(

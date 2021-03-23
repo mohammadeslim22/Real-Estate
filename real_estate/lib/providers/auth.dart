@@ -104,8 +104,10 @@ class Auth with ChangeNotifier {
   }
 
   Future<bool> login(String phone, String pass, BuildContext context) async {
-    await data.setData("loggedin", "true");
-    return await databaseHelper.readUser(phone, pass);
+    bool login = await databaseHelper.readUser(phone, pass);
+    print(phone);
+    print("login  $login");
+    return login;
   }
 
   Future<void> register(
@@ -113,10 +115,10 @@ class Auth with ChangeNotifier {
     MainProvider mainProv,
     String username,
     String pass,
-    String birth,
     String email,
     String mobile,
   ) async {
+    print("user is trying to register here $username  $pass  $email  $mobile");
     await databaseHelper
         .adduser(User(email, username, mobile, pass, config.long, config.lat));
   }
@@ -140,7 +142,7 @@ class Auth with ChangeNotifier {
   void signInAnonymously() {}
 
   Future<void> signOut() async {
-    await data.setData('authorization', null);
+    await data.setData("loggedin", "false");
     getIt<NavigationService>().navigateTo('/login', null);
   }
 }

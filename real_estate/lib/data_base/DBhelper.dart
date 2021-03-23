@@ -1,4 +1,7 @@
+import 'package:real_estate/constants/config.dart';
+import 'package:real_estate/helpers/data.dart';
 import 'package:real_estate/models/User.dart';
+import 'package:real_estate/models/property.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
 import 'package:path/path.dart';
@@ -25,6 +28,14 @@ class DBHelper {
     // await db.execute('CREATE TABLE Notes (note_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, description TEXT)');
     await db.execute(
         'CREATE TABLE Users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT,name TEXT ,phones TEXT,password TEXT, longitude TEXT, latitude TEXT)');
+    await db.execute(
+        'CREATE TABLE Properties (p_id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER , type TEXT,longitude TEXT, latitude TEXT,rooms INTEGER, price TEXT, term TEXT, date_added TEXT,furniture INTEGER )');
+    await db.execute(
+        'CREATE TABLE Searches (s_id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER search_string TEXT)');
+    await db.execute(
+        'CREATE TABLE favs (f_id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER ,p_id INTEGER)');
+    await db.execute(
+        'CREATE TABLE Images (i_id INTEGER PRIMARY KEY AUTOINCREMENT,p_id INTEGER, image TEXT)');
   }
 
   // Future<Note> addNote(Note note) async {
@@ -34,7 +45,8 @@ class DBHelper {
   // }
   Future<User> adduser(User user) async {
     var dbClient = await db;
-    await dbClient.insert('Users', user.toMap());
+    int addUser = await dbClient.insert('Users', user.toMap());
+    print("ADDED USER CORRECTLY ? $addUser");
     return user;
   }
 
@@ -47,6 +59,8 @@ class DBHelper {
       for (int i = 0; i < maps.length; i++) {
         users.add(User.fromMapObject(maps[i]));
       }
+    } else {
+      print("no users -------------------empty");
     }
     return users;
   }
@@ -54,13 +68,44 @@ class DBHelper {
   Future<bool> readUser(String phone, String pass) async {
     var dbClient = await db;
     var result = await dbClient.rawQuery(
-        'Select * from Users Where phones= $phone AND password= $pass');
+        'Select * from Users Where Users.phones = "$phone" AND Users.password = "$pass"');
     if (result.isEmpty) {
       return false;
     } else {
+      User u = User.fromMapObject(result[0]);
+      config.user = u;
+      await data.setData("loggedin", "true");
       print(result);
       return true;
     }
+  }
+
+  Future<List<Property>> readMyProperties(int userId) async {
+    var dbClient = await db;
+    var result = await dbClient
+        .rawQuery('Select * from Properties where user_id ="$userId"');
+    List<Map> maps = result;
+    List<Property> properties = [];
+    if (maps.length > 0) {
+      for (int i = 0; i < maps.length; i++) {
+        properties.add(Property.fromMapObject(maps[i]));
+      }
+    }
+
+    // List<Map> iMaps = result;
+    properties.forEach((Property p) async {
+      List<PropertyImage> pImages = [];
+      List<Map> iMaps =
+          await dbClient.rawQuery('Select * from Images where p_id ="${p.id}"');
+      if (iMaps.length > 0) {
+        for (int i = 0; i < iMaps.length; i++) {
+          pImages.add(PropertyImage.fromMap(iMaps[i]));
+        }
+      }
+      p.images = pImages;
+    });
+
+    return properties;
   }
   // Future<List<JoinObject>> getJoinData() async {
   //   var dbClient = await db;

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:real_estate/models/User.dart';
 
 class Config {
   factory Config() {
@@ -20,10 +21,12 @@ class Config {
   List<Address> addresses;
   double lat = 0.0;
   double long = 0.0;
+
   String token = "";
   String profileUrl =
       "https://png.pngtree.com/png-clipart/20190924/original/pngtree-businessman-user-avatar-free-vector-png-image_4827807.jpg";
   String username;
+  User user;
   bool amIcomingFromHome = false;
   bool prifleNoVerfiyVisit = false;
   bool prifleNoVerfiyDone = false;

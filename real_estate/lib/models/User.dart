@@ -33,7 +33,7 @@ class User {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
     if (id != null) {
-      map['userid'] = id;
+      map['user_id'] = id;
     }
     map['email'] = email;
     map['name'] = name;
