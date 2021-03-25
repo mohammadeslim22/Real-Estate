@@ -109,7 +109,9 @@ class _AutoLocateState extends State<AutoLocate> {
         child: Stack(
           children: <Widget>[
             Scaffold(
-              appBar: AppBar(title: Text("حدد موقعي", style: styles.appBars)),
+              appBar: AppBar(
+                  title: Text("حدد موقعي", style: styles.appBars),
+                  centerTitle: true),
               key: _scaffoldKey,
               resizeToAvoidBottomInset: false,
               body: Stack(
@@ -126,6 +128,9 @@ class _AutoLocateState extends State<AutoLocate> {
                     //       zIndex: 20,
                     //       strokeWidth: 2)
                     // },
+                    myLocationButtonEnabled: false,
+                    indoorViewEnabled: true,
+                    zoomControlsEnabled: false,
                     onMapCreated: _onMapCreated,
                     padding: const EdgeInsets.only(bottom: 60),
                     mapType: MapType.normal,
@@ -224,11 +229,8 @@ class _AutoLocateState extends State<AutoLocate> {
             Align(
               alignment: Alignment.center,
               child: Container(
-                child: Icon(
-                  FontAwesomeIcons.mapMarkerAlt,
-                  color: colors.blue,
-                  size: 32,
-                ),
+                child: Icon(FontAwesomeIcons.mapMarkerAlt,
+                    color: colors.blue, size: 32),
               ),
             ),
           ],

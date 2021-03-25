@@ -13,7 +13,7 @@ getIt.registerLazySingleton(() => NavigationService());
 getIt.registerLazySingleton(() => MainProvider());
 getIt.registerLazySingleton(() => Auth());
 getIt.registerLazySingleton(() => PropertiesProvider());
- getIt.registerLazySingleton(() => LocationProvider());
+getIt.registerLazySingleton(() => LocationProvider());
 
 
 

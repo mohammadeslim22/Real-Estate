@@ -35,7 +35,7 @@ class Property {
     this.userId = map['user_id'];
     this.type = map['type'];
     this.rooms = map['rooms'];
-    this.price = map["price"];
+    this.price = double.parse(map["price"].toString());
     this.furniture = map["furniture"];
     this.dateAdded = map['date_added'];
     this.longitude = double.parse(map['longitude'].toString());
@@ -45,12 +45,24 @@ class Property {
 
 class PropertyImage {
   int id;
+  int pId;
   String image;
 
-  PropertyImage(this.id, this.image);
+  PropertyImage(this.pId,this.image);
+  Map<String, dynamic> toMap() {
+    var map = Map<String, dynamic>();
+    if (id != null) {
+      map['i_id'] = id;
+    }
+    map["p_id"] = pId;
+    map['image'] = image;
+
+    return map;
+  }
 
   PropertyImage.fromMap(Map map) {
-    id = map[id];
-    image = map[image];
+    id = map["id"];
+    pId = map["p_id"];
+    image = map["image"];
   }
 }

@@ -12,17 +12,19 @@ import 'constants/route.dart';
 import 'helpers/data.dart';
 import 'helpers/service_locator.dart';
 import 'helpers/size_config.dart';
-import 'models/User.dart';
 import 'providers/auth.dart';
 import 'providers/mainprovider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   setupLocator();
-  await data.getData('loggedin').then<dynamic>((String auth) {
+  await data.getData('loggedin').then<dynamic>((String auth) async {
     print("auth what :$auth");
     if (auth == "true") {
+      config.userId = int.parse(await data.getData("user_id"));
+      config.username = await data.getData("user_name");
       config.loggedin = true;
     } else {
       config.loggedin = false;
@@ -34,10 +36,10 @@ Future<void> main() async {
       providers: <ChangeNotifierProvider<ChangeNotifier>>[
         ChangeNotifierProvider<Auth>.value(value: getIt<Auth>()),
         ChangeNotifierProvider<MainProvider>(create: (_) => MainProvider()),
-        ChangeNotifierProvider<PropertiesProvider>(
-            create: (_) => PropertiesProvider()),
-        ChangeNotifierProvider<LocationProvider>(
-            create: (_) => LocationProvider()),
+        ChangeNotifierProvider<PropertiesProvider>.value(
+            value: getIt<PropertiesProvider>()),
+        ChangeNotifierProvider<LocationProvider>.value(
+            value: getIt<LocationProvider>()),
       ],
       child: MyApp(),
     ),
@@ -67,10 +69,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 DBHelper databaseHelper = DBHelper();
-@override
-initState() {
-  databaseHelper.initDatabase();
-}
+// @override
+// initState() {
+//   databaseHelper.initDatabase();
+// }
 
 void handleClick(String value) {
   switch (value) {
@@ -101,11 +103,11 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: Icon(Icons.person_outline),
             onPressed: () async {
-              List<User> users = await databaseHelper.readAllUsers();
-              users.forEach((user) => {
-                    print(
-                        "user.id ${user.id} user.phone ${user.phones} user.pass ${user.password} user.latitude ${user.latitude} user.longitude ${user.longitude}")
-                  });
+              // List<User> users = await databaseHelper.readAllUsers();
+              // users.forEach((user) => {
+              //       print(
+              //           "user.id ${user.id} user.phone ${user.phones} user.pass ${user.password} user.latitude ${user.latitude} user.longitude ${user.longitude}")
+              //     });
               print("config.loggedin ${config.loggedin}");
               if (config.loggedin) {
                 Navigator.pushNamed(context, "/Account");
@@ -154,7 +156,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text("للبيع",
                             style: TextStyle(
                                 fontSize: 24, color: Color(0xFF170531))),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/Search",
+                              arguments: <String, String>{
+                                "search_title": "للبيع"
+                              });
+                        },
                       ),
                       width: SizeConfig.blockSizeHorizontal * 32,
                       height: SizeConfig.blockSizeVertical * 6,
@@ -169,7 +176,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text("للإيجار",
                             style: TextStyle(
                                 fontSize: 24, color: Color(0xFF170531))),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/Search",
+                              arguments: <String, String>{
+                                "search_title": "للإيجار"
+                              });
+                        },
                       ),
                       width: SizeConfig.blockSizeHorizontal * 32,
                       height: SizeConfig.blockSizeVertical * 6,
@@ -270,7 +282,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            onTap: () {},
+            onTap: () {
+              print(
+                  "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaay props");
+              if (config.loggedin) {
+                Navigator.pushNamed(context, "/MyProps");
+              } else {
+                Fluttertoast.showToast(msg: "سجل دخولك من فضلك");
+                Navigator.popAndPushNamed(context, "/login");
+              }
+            },
           ),
           Divider(),
           // Padding(

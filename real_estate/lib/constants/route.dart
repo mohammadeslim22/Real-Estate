@@ -6,6 +6,7 @@ import 'package:real_estate/ui/add_property.dart';
 import 'package:real_estate/ui/auth/login_screen.dart';
 import 'package:real_estate/ui/auth/registration_screen.dart';
 import 'package:real_estate/ui/my_property.dart';
+import 'package:real_estate/ui/search.dart';
 import 'package:real_estate/ui/setLocation.dart';
 
 // Generate all application routes with simple transition
@@ -43,6 +44,10 @@ Route<PageController> onGenerateRoute(RouteSettings settings) {
              case "/AutoLocate":
       page = PageTransition<PageController>(
           child: AutoLocate(lat: args["lat"], long: args["long"],), type: PageTransitionType.rightToLeftWithFade);
+      break;
+                 case "/Search":
+      page = PageTransition<PageController>(
+          child: SearchScreen(search: args["search_title"]), type: PageTransitionType.rightToLeftWithFade);
       break;
   }
 

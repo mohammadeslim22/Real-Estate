@@ -26,7 +26,8 @@ class Config {
   String profileUrl =
       "https://png.pngtree.com/png-clipart/20190924/original/pngtree-businessman-user-avatar-free-vector-png-image_4827807.jpg";
   String username;
-  User user;
+  int userId;
+
   bool amIcomingFromHome = false;
   bool prifleNoVerfiyVisit = false;
   bool prifleNoVerfiyDone = false;

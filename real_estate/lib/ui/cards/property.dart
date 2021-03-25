@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:real_estate/constants/colors.dart';
+import 'package:real_estate/helpers/image_utility.dart';
 import 'package:real_estate/models/property.dart';
 
 class PropertyCard extends StatefulWidget {
@@ -38,7 +39,7 @@ class _PropertyCardState extends State<PropertyCard> {
         children: [
           CarouselSlider(
               options: CarouselOptions(
-                  height: 118,
+                  height: 300,
                   viewportFraction: 1,
                   initialPage: 0,
                   enableInfiniteScroll: true,
@@ -50,31 +51,34 @@ class _PropertyCardState extends State<PropertyCard> {
                   scrollDirection: Axis.horizontal,
                   pageViewKey:
                       const PageStorageKey<dynamic>('carousel_slider')),
-              items: prop.images ??
-                  <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: Image.asset("assets/images/logo.jpg",
-                          width: MediaQuery.of(context).size.width,
-                          fit: BoxFit.cover),
-                    ),
-                  ]),
+              items: prop.images.isEmpty
+                  ? <Widget>[
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                       
+                        child: Image.asset("assets/images/logo.jpg",
+                            width: MediaQuery.of(context).size.width,
+                            fit: BoxFit.fill),
+                      ),
+                    ]
+                  : prop.images.map((photo) {
+                      return Utility.imageFromBase64String(photo.image,context);
+                    }).toList()),
           Container(
-            width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: colors.grey,
-            child: Text(prop.price.toString()),
-          ),
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              color: colors.grey,
+              child: Text(prop.price.toString())),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(prop.type),
-                  Text(addresses),
+                  Text(prop.type ?? ""),
+                  Text(addresses ?? ""),
                   const SizedBox(height: 6),
-                  Text(prop.dateAdded),
+                  Text(prop.dateAdded ?? ""),
                 ],
               )),
           Divider(),

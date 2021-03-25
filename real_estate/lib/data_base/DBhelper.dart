@@ -17,7 +17,7 @@ class DBHelper {
     return _db;
   }
 
-  initDatabase() async {
+  Future<dynamic> initDatabase() async {
     io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentDirectory.path, 'real_estate.db');
     var db = await openDatabase(path, version: 1, onCreate: _onCreate);
@@ -25,11 +25,12 @@ class DBHelper {
   }
 
   _onCreate(Database db, int version) async {
+    print("DB Created *****************************");
     // await db.execute('CREATE TABLE Notes (note_id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, description TEXT)');
     await db.execute(
         'CREATE TABLE Users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT,name TEXT ,phones TEXT,password TEXT, longitude TEXT, latitude TEXT)');
     await db.execute(
-        'CREATE TABLE Properties (p_id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER , type TEXT,longitude TEXT, latitude TEXT,rooms INTEGER, price TEXT, term TEXT, date_added TEXT,furniture INTEGER )');
+        'CREATE TABLE Properties (p_id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER , type TEXT,longitude TEXT, latitude TEXT,rooms INTEGER, price TEXT, term TEXT, date_added TEXT,furniture INTEGER, description TEXT )');
     await db.execute(
         'CREATE TABLE Searches (s_id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER search_string TEXT)');
     await db.execute(
@@ -73,11 +74,22 @@ class DBHelper {
       return false;
     } else {
       User u = User.fromMapObject(result[0]);
-      config.user = u;
+      config.userId = u.id;
+      await data.setData("user_id", u.id.toString());
+      await data.setData("user_name", u.name.toString());
       await data.setData("loggedin", "true");
       print(result);
       return true;
     }
+  }
+
+  Future<int> addProp(Property p) async {
+    var dbClient = await db;
+    await dbClient.insert('Properties', p.toMap());
+    List<Map> maxId =
+        await dbClient.rawQuery("Select MAX(p_id) from Properties");
+    int lastPropId = maxId[0]["MAX(p_id)"];
+    return lastPropId;
   }
 
   Future<List<Property>> readMyProperties(int userId) async {
@@ -106,6 +118,13 @@ class DBHelper {
     });
 
     return properties;
+  }
+
+  Future<bool> addImage(PropertyImage pI) async {
+    var dbClient = await db;
+    int addImage = await dbClient.insert('Images', pI.toMap());
+    print("addImage addImage CORRECTLY ? $addImage");
+    return addImage == 1;
   }
   // Future<List<JoinObject>> getJoinData() async {
   //   var dbClient = await db;

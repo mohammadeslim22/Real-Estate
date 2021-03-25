@@ -3,10 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:real_estate/constants/config.dart';
 import 'package:real_estate/constants/styles.dart';
-import 'package:real_estate/data_base/DBhelper.dart';
 import 'package:real_estate/providers/mainprovider.dart';
 import 'package:real_estate/providers/auth.dart';
-import 'package:real_estate/ui/widgets/countryCodePicker.dart';
 import '../widgets/buttonTouse.dart';
 import '../widgets/text_form_input.dart';
 import 'package:flutter/services.dart';
@@ -62,7 +60,6 @@ class _MyRegistrationState extends State<Registration>
       BuildContext context, MainProvider mainProvider, Auth auth) {
     final bool isRTL = Directionality.of(context) == TextDirection.rtl;
     final FocusNode focus = FocusNode();
-    final FocusNode focusminus1 = FocusNode();
     final FocusNode focus1 = FocusNode();
     final FocusNode focus2 = FocusNode();
     final FocusNode focus3 = FocusNode();
@@ -81,13 +78,13 @@ class _MyRegistrationState extends State<Registration>
                   prefixIcon: Icons.person_outline,
                   kt: TextInputType.visiblePassword,
                   obscureText: false,
-                  focusNode: focusminus1,
+                  focusNode: focus,
                   readOnly: false,
                   onFieldSubmitted: () {
-                    focus.requestFocus();
+                    focus1.requestFocus();
                   },
                   onTab: () {
-                    focusminus1.requestFocus();
+                    focus.requestFocus();
                   },
                   validator: (String value) {
                     if (value.length < 3) {
@@ -101,9 +98,14 @@ class _MyRegistrationState extends State<Registration>
                   prefixIcon: Icons.phone,
                   kt: TextInputType.phone,
                   readOnly: false,
-                  onTab: () {},
+                  onTab: () {
+                    focus1.requestFocus();
+                  },
+                  onFieldSubmitted: () {
+                    focus2.requestFocus();
+                  },
                   obscureText: _obscureText,
-                  focusNode: focus2,
+                  focusNode: focus1,
                   validator: (String value) {
                     if (mobileNoController.text.length < 6) {
                       return "أدخل رقم هاتف صحيح";
@@ -117,12 +119,12 @@ class _MyRegistrationState extends State<Registration>
                   kt: TextInputType.emailAddress,
                   obscureText: false,
                   readOnly: false,
-                  focusNode: focus,
+                  focusNode: focus2,
                   onTab: () {
-                    focus.requestFocus();
+                    focus2.requestFocus();
                   },
                   onFieldSubmitted: () {
-                    focus1.requestFocus();
+                    focus3.requestFocus();
                   },
                   validator: (String value) {
                     if (value.isEmpty) {
@@ -137,6 +139,9 @@ class _MyRegistrationState extends State<Registration>
                   kt: TextInputType.visiblePassword,
                   readOnly: false,
                   onTab: () {},
+                  onFieldSubmitted: () {
+                    focus4.requestFocus();
+                  },
                   suffixicon: IconButton(
                     icon: Icon(
                       (_obscureText == false)
@@ -259,7 +264,6 @@ class _MyRegistrationState extends State<Registration>
                               });
                               await auth.register(
                                 context,
-                                mainProvider,
                                 usernameController.text,
                                 passwordController.text,
                                 emailController.text,

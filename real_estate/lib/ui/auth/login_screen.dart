@@ -166,7 +166,8 @@ class _MyLoginScreenState extends State<LoginScreen>
                             });
                             if (await auth.login(_usernameController.text,
                                 _passwordController.text, context)) {
-                              Navigator.popAndPushNamed(context, "/Account");
+                              Navigator.popAndPushNamed(context, "/Home");
+                              Navigator.pushNamed(context, "/Account");
                             } else {
                               _formKey.currentState.validate();
                             }

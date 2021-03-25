@@ -112,7 +112,6 @@ class Auth with ChangeNotifier {
 
   Future<void> register(
     BuildContext context,
-    MainProvider mainProv,
     String username,
     String pass,
     String email,
@@ -142,6 +141,7 @@ class Auth with ChangeNotifier {
   void signInAnonymously() {}
 
   Future<void> signOut() async {
+    config.loggedin = false;
     await data.setData("loggedin", "false");
     getIt<NavigationService>().navigateTo('/login', null);
   }
