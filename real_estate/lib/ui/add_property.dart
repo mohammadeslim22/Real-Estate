@@ -1,7 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter_absolute_path/flutter_absolute_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -10,8 +6,10 @@ import 'package:real_estate/providers/location_provider.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:real_estate/providers/mainprovider.dart';
 import 'package:real_estate/providers/property_provider.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'widgets/text_form_input.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 
 class AddProp extends StatefulWidget {
   AddProp({Key key, this.address}) : super(key: key);
@@ -29,6 +27,9 @@ class _AddPropState extends State<AddProp> {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController roomsController = TextEditingController();
+  final RoundedLoadingButtonController _btnController =
+      new RoundedLoadingButtonController();
+
   String type = "";
   @override
   void initState() {
@@ -37,17 +38,17 @@ class _AddPropState extends State<AddProp> {
     locationController.text = widget.address;
   }
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool furn = true;
+  String propState = "للبيع";
   final TextEditingController descController = TextEditingController();
   List<Asset> images = <Asset>[];
   final List<String> _items = ['شقة', 'فيلا', 'عمارة'].toList();
   @override
   Widget build(BuildContext context) {
-    final MainProvider mainProvider = Provider.of<MainProvider>(context);
     final PropertiesProvider propProvider =
         Provider.of<PropertiesProvider>(context);
-
-    bool furn = true;
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
     return Scaffold(
         backgroundColor: colors.white,
@@ -76,14 +77,18 @@ class _AddPropState extends State<AddProp> {
                       prefixIcon: Icons.my_location,
                       kt: TextInputType.visiblePassword,
                       readOnly: true,
-                      onTab: () async {
+                      onTab: () {
                         try {
+                          print("where are we going");
                           Navigator.popAndPushNamed(context, '/AutoLocate',
                               arguments: <String, double>{
                                 "lat": 24.774265,
-                                "long": 46.738586
+                                "long": 46.738586,
+                                "choice": 1.0
                               });
-                        } catch (e) {}
+                        } catch (e) {
+                          print("going in catch $e");
+                        }
                       },
                       suffixicon: IconButton(
                         icon:
@@ -113,6 +118,33 @@ class _AddPropState extends State<AddProp> {
                           color: colors.blue)),
                   Visibility(
                       child: buildGridView(), visible: images.isNotEmpty),
+
+                  CustomRadioButton(
+                    absoluteZeroSpacing: false,
+                    unSelectedColor: Theme.of(context).canvasColor,
+                    buttonLables: [
+                      "للبيع",
+                      "للإيجار",
+                    ],
+                    buttonValues: [
+                      "للبيع",
+                      "للإيجار",
+                    ],
+                    radioButtonValue: (value) {
+                      setState(() {
+                        propState = value.toString();
+                      });
+                    },
+                    defaultSelected: "للبيع",
+                    width: MediaQuery.of(context).size.width / 3,
+                    horizontal: false,
+                    enableShape: true,
+                    enableButtonWrap: true,
+                    selectedColor: Theme.of(context).accentColor,
+                    padding: 5,
+                    spacing: 0.0,
+                    unSelectedBorderColor: colors.blue,
+                  ),
                   const SizedBox(height: 12),
                   TextFormInput(
                       text: "ادخل السعر",
@@ -150,6 +182,7 @@ class _AddPropState extends State<AddProp> {
                           return null;
                         }
                       }),
+
                   Padding(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,38 +220,67 @@ class _AddPropState extends State<AddProp> {
                                 type = choice;
                               });
                             },
-                          )
+                          ),
+
+                          // LiteRollingSwitch(
+
+                          //   value: true,
+                          //   textOn: 'للبيع',
+                          //   textOff: 'للإيجار',
+                          //   colorOn: Colors.blue,
+                          //   colorOff: Colors.grey,
+                          //   iconOn: Icons.done,
+                          //   iconOff: Icons.remove_circle_outline,
+                          //   textSize: 16.0,
+                          //   onSwipe: () {
+                          //     setState(() {
+                          //       propState = !propState;
+                          //     });
+                          //   },
+                          //   onChanged: (bool state) {},
+                          // ),
                         ],
                       ),
                       padding:
                           EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
                   simpleForm(3, 5, "message", descController),
                   const SizedBox(height: 24),
-                  RaisedButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18.0),
-                          side: BorderSide(color: colors.blue)),
-                      onPressed: () async {
-                        if (_formKey.currentState.validate()) {
-                          mainProvider.togelf(true);
-                          print(
-                              "trying to add prop $type ${int.parse(roomsController.text)},${double.parse(priceController.text)},$furn ${descController.text}");
-                          await propProvider.addProp(
-                              type,
-                              int.parse(roomsController.text),
-                              double.parse(priceController.text),
-                              furn ? 1 : 0,
-                              descController.text,
-                              images);
+                  RoundedLoadingButton(
+                    child: Text("إضافة مسكن",
+                        style: TextStyle(color: Colors.white, fontSize: 24)),
+                    controller: _btnController,
+                    onPressed: () async {
+                      if (_formKey.currentState.validate()) {
+                        await propProvider.addProp(
+                            propState,
+                            type,
+                            int.parse(roomsController.text),
+                            int.parse(priceController.text),
+                            furn ? 1 : 0,
+                            descController.text,
+                            images);
+                            Navigator.popAndPushNamed(context, "/MyProps");
+                      }
+                    },
+                  ),
+                  // RaisedButton(
+                  //     shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(18.0),
+                  //         side: BorderSide(color: colors.blue)),
+                  //     onPressed: () async {
+                  //       if (_formKey.currentState.validate()) {
+                  //         mainProvider.togelf(true);
+                  //         print(
+                  //             "trying to add prop $type ${int.parse(roomsController.text)},${double.parse(priceController.text)},$furn ${descController.text}");
 
-                          Navigator.popAndPushNamed(context, "/MyProps");
+                  //         Navigator.popAndPushNamed(context, "/MyProps");
 
-                          mainProvider.togelf(false);
-                        }
-                      },
-                      color: colors.blue,
-                      textColor: colors.white,
-                      child: mainProvider.returnchild("إضافة مسكن")),
+                  //         mainProvider.togelf(false);
+                  //       }
+                  //     },
+                  //     color: colors.blue,
+                  //     textColor: colors.white,
+                  //     child: mainProvider.returnchild("إضافة مسكن")),
                 ],
               ));
         }));
@@ -248,7 +310,7 @@ class _AddPropState extends State<AddProp> {
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
           actionBarColor: "#abcdef",
-          actionBarTitle: "Example App",
+          actionBarTitle: "اختار صور المسكن",
           allViewTitle: "All Photos",
           useDetailsView: false,
           selectCircleStrokeColor: "#000000",

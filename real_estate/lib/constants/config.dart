@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:geocoder/geocoder.dart';
-import 'package:real_estate/models/User.dart';
 
 class Config {
   factory Config() {

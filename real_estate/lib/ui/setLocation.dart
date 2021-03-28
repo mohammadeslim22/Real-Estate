@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:real_estate/constants/colors.dart';
 import 'package:real_estate/constants/config.dart';
+import 'package:real_estate/data_base/DBhelper.dart';
 import 'package:real_estate/helpers/functions.dart';
 import 'package:real_estate/helpers/service_locator.dart';
 import 'package:real_estate/providers/location_provider.dart';
@@ -16,13 +17,14 @@ import 'package:location/location.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:provider/provider.dart';
 import 'package:real_estate/constants/styles.dart';
+import 'package:real_estate/providers/property_provider.dart';
 
 class AutoLocate extends StatefulWidget {
   const AutoLocate({Key key, this.long, this.lat, this.choice})
       : super(key: key);
   final double long;
   final double lat;
-  final int choice;
+  final double choice;
   @override
   _AutoLocateState createState() => _AutoLocateState();
 }
@@ -36,6 +38,7 @@ class _AutoLocateState extends State<AutoLocate> {
   PermissionStatus permissionGranted;
   LocationData locationData;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  DBHelper databaseHelper = DBHelper();
 
   final GlobalKey _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -321,16 +324,23 @@ class _AutoLocateState extends State<AutoLocate> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
                     side: BorderSide(color: colors.orange)),
-                onPressed: () {
+                onPressed: () async {
                   getIt<LocationProvider>().setLocation(lat, long);
                   getIt<LocationProvider>().setAddress(address.addressLine);
                   print(
                       "addPropAddress ${getIt<LocationProvider>().addPropAddress}");
+                  if (widget.choice == 1) {
+                    Navigator.popAndPushNamed(context, '/AddProp',
+                        arguments: <String, String>{
+                          "address": address.addressLine
+                        });
+                  } else {
+                    await databaseHelper.addSearch(address.addressLine.trim());
+                    getIt<PropertiesProvider>().addressController.text =
+                        address.addressLine;
+                    Navigator.pop(context);
+                  }
 
-                  Navigator.popAndPushNamed(context, '/AddProp',
-                      arguments: <String, String>{
-                        "address": address.addressLine
-                      });
                   // Navigator.pop(context);
                 },
                 color: colors.orange,

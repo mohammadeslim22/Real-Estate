@@ -247,29 +247,44 @@ class _MyHomePageState extends State<MyHomePage> {
               ])),
           InkWell(
               child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text("عمليات بحث محفوظة", style: TextStyle(fontSize: 24)),
-                const SizedBox(width: 24),
-                Icon(Icons.star, size: 36)
-              ],
-            ),
-          )),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text("عمليات بحث محفوظة", style: TextStyle(fontSize: 24)),
+                    const SizedBox(width: 24),
+                    Icon(Icons.star, size: 36)
+                  ],
+                ),
+              ),
+              onTap: () {
+                if (config.loggedin) {
+                  Navigator.pushNamed(context, "/PerviousSearch");
+                } else {
+                  Fluttertoast.showToast(msg: "سجل دخولك من فضلك");
+                }
+              }),
           Divider(),
           InkWell(
               child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text("العقارات المفضلة", style: TextStyle(fontSize: 24)),
-                const SizedBox(width: 24),
-                Icon(Icons.favorite, size: 36)
-              ],
-            ),
-          )),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text("العقارات المفضلة", style: TextStyle(fontSize: 24)),
+                    const SizedBox(width: 24),
+                    Icon(Icons.favorite, size: 36)
+                  ],
+                ),
+              ),
+              onTap: () {
+                if (config.loggedin) {
+                  Navigator.pushNamed(context, "/FavProps");
+                } else {
+                  Fluttertoast.showToast(msg: "سجل دخولك من فضلك");
+                  Navigator.popAndPushNamed(context, "/login");
+                }
+              }),
           InkWell(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -283,8 +298,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             onTap: () {
-              print(
-                  "maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaay props");
               if (config.loggedin) {
                 Navigator.pushNamed(context, "/MyProps");
               } else {

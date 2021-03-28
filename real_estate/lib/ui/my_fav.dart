@@ -11,20 +11,17 @@ import 'package:real_estate/models/property.dart';
 import 'package:real_estate/providers/property_provider.dart';
 import 'cards/propertyCard.dart';
 
-class LoadMyProps extends StatelessWidget {
-  LoadMyProps({Key key}) : super(key: key);
+class LoadMyFav extends StatelessWidget {
+  LoadMyFav({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     {
-      return
-          //  getIt<PropertiesProvider>().myProps.isEmpty
-          //     ?
-          FutureBuilder<List<Property>>(
-        future: getIt<PropertiesProvider>().getMyProps(),
+      return FutureBuilder<List<Property>>(
+        future: getIt<PropertiesProvider>().getFavs(),
         builder: (BuildContext ctx, AsyncSnapshot<List<Property>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return MyProperties(
+            return MyFavProperties(
               props: snapshot.data,
             );
           } else {
@@ -39,15 +36,15 @@ class LoadMyProps extends StatelessWidget {
   }
 }
 
-class MyProperties extends StatefulWidget {
-  MyProperties({Key key, this.props}) : super(key: key);
+class MyFavProperties extends StatefulWidget {
+  MyFavProperties({Key key, this.props}) : super(key: key);
 
   final List<Property> props;
   @override
   _MyPropertiesState createState() => _MyPropertiesState();
 }
 
-class _MyPropertiesState extends State<MyProperties> {
+class _MyPropertiesState extends State<MyFavProperties> {
   @override
   void initState() {
     super.initState();
@@ -102,7 +99,7 @@ class _MyPropertiesState extends State<MyProperties> {
             ),
           ],
         ),
-        body: Consumer<PropertiesProvider>( 
+        body: Consumer<PropertiesProvider>(
           builder:
               (BuildContext context, PropertiesProvider value, Widget child) {
             return Visibility(
@@ -111,7 +108,7 @@ class _MyPropertiesState extends State<MyProperties> {
                 shrinkWrap: true,
                 itemCount: widget.props.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return PropertyCard(prop: widget.props[index], fav: false);
+                  return PropertyCard(prop: widget.props[index], fav: true);
                 },
               ),
               replacement: GoogleMap(
@@ -137,7 +134,7 @@ class _MyPropertiesState extends State<MyProperties> {
                 },
                 padding: const EdgeInsets.only(bottom: 60),
                 mapType: MapType.normal,
-                markers: Set<Marker>.of(value.markers),
+                markers: Set<Marker>.of(value.favMarkers),
                 initialCameraPosition: CameraPosition(
                     target: LatLng(config.lat, config.long), zoom: 13),
                 onCameraMove: (CameraPosition pos) {
@@ -148,15 +145,7 @@ class _MyPropertiesState extends State<MyProperties> {
               ),
             );
           },
-        ),
-        floatingActionButton: FloatingActionButton(
-            elevation: 0.0,
-            child: Icon(Icons.add, size: 32, color: colors.white),
-            backgroundColor: new Color(0xFF13B4B9),
-            onPressed: () {
-              Navigator.pushNamed(context, "/AddProp",
-                  arguments: <String, dynamic>{"address": "", "choice": 1.0});
-            }));
+        ));
   }
 
   Future<void> _animateToUser(PropertiesProvider propertiesProvider) async {

@@ -4,17 +4,14 @@ import 'package:real_estate/constants/config.dart';
 import 'package:real_estate/data_base/DBhelper.dart';
 import 'package:real_estate/helpers/data.dart';
 import 'package:real_estate/models/User.dart';
-import 'package:real_estate/providers/mainprovider.dart';
 import 'package:real_estate/services/navigationService.dart';
 import 'package:real_estate/helpers/service_locator.dart';
 import 'package:country_provider/country_provider.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 class Auth with ChangeNotifier {
   DBHelper databaseHelper = DBHelper();
 
-  Auth() {
-    // TODO(ahmed): do login by dio library
-  }
   String myCountryCode;
   String myCountryDialCode;
   String dialCodeFav;
@@ -103,7 +100,17 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
+  final key =
+      encrypt.Key.fromUtf8('put32charactershereeeeeeeeeeeee!'); //32 chars
+  final iv = encrypt.IV.fromUtf8('put16characters!');
+  String encryptMyData(String text) {
+    final e = encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
+    final encrypted_data = e.encrypt(text, iv: iv);
+    return encrypted_data.base64;
+  }
+
   Future<bool> login(String phone, String pass, BuildContext context) async {
+    // String password = encryptMyData(pass);
     bool login = await databaseHelper.readUser(phone, pass);
     print(phone);
     print("login  $login");
