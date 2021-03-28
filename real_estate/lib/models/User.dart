@@ -1,3 +1,5 @@
+import 'package:encrypt/encrypt.dart';
+
 class User {
   int id;
   String email;
@@ -17,7 +19,8 @@ class User {
   String get emaill => email;
 
   String get description => phones;
-
+  final key = Key.fromUtf8('put32charactershereeeeeeeeeeeee!'); //32 chars
+  final iv = IV.fromUtf8('put16characters!');
   set setemail(String newemail) {
     if (newemail.length <= 255) {
       this.email = newemail;
@@ -30,6 +33,12 @@ class User {
     }
   }
 
+  String encryptMyData(String text) {
+    final e = Encrypter(AES(key, mode: AESMode.cbc));
+    final encrypted_data = e.encrypt(text, iv: iv);
+    return encrypted_data.base64;
+  }
+
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
     if (id != null) {
@@ -38,7 +47,7 @@ class User {
     map['email'] = email;
     map['name'] = name;
     map['phones'] = phones;
-    map['password'] = password;
+    map['password'] = encryptMyData(password);
     map['longitude'] = longitude;
     map['latitude'] = latitude;
     return map;

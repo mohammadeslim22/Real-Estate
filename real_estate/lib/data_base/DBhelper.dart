@@ -96,10 +96,10 @@ class DBHelper {
   }
 
   Future<bool> readUser(String phone, String pass) async {
-    // String password = encryptMyData(pass);
+    String password = encryptMyData(pass);
     var dbClient = await db;
     var result = await dbClient.rawQuery(
-        'Select * from Users Where Users.phones = "$phone" AND Users.password = "$pass"');
+        'Select * from Users Where Users.phones = "$phone" AND Users.password = "$password"');
     if (result.isEmpty) {
       return false;
     } else {
