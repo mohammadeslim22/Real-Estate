@@ -120,7 +120,7 @@ class _PropScreenState extends State<PropScreen> {
                       " حالة الفرش :${prop.furniture == 1 ? "مفروشة" : "غير مفروشة"}",
                       style: TextStyle(color: colors.ggrey)),
                   const SizedBox(height: 16),
-                  Text("${prop.description ?? ""}"),
+                  Text(prop.description ?? ""),
                 ],
               )),
           Divider(),

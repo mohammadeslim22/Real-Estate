@@ -22,7 +22,8 @@ class Property {
       this.dateAdded,
       this.longitude,
       this.latitude,
-      this.images);
+      this.images,
+      this.description);
 
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();

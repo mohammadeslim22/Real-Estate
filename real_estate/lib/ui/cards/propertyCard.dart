@@ -103,6 +103,7 @@ class _PropertyCardState extends State<PropertyCard> {
                     children: [
                       Text(prop.type ?? ""),
                       Text(addresses ?? ""),
+                      Text(prop.description?? ""),
                       const SizedBox(height: 6),
                       Text(prop.dateAdded ?? ""),
                     ],

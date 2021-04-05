@@ -44,11 +44,17 @@ class PropertiesProvider with ChangeNotifier {
     return myProps;
   }
 
-  Future<List<Property>> getSearch(String state,int firstPrice, int secondprice,
-      String timeAdded, String type, int roomMin, int roomMax, int furn) async {
-    mySearch = await databaseHelper.searchProps(
-      state,
-        firstPrice, secondprice, timeAdded, type, roomMin, roomMax, furn);
+  Future<List<Property>> getSearch(
+      String state,
+      int firstPrice,
+      int secondprice,
+      String timeAdded,
+      String type,
+      int roomMin,
+      int roomMax,
+      int furn) async {
+    mySearch = await databaseHelper.searchProps(state, firstPrice, secondprice,
+        timeAdded, type, roomMin, roomMax, furn);
     for (final Property property in mySearch) {
       await addSearchMarker(
           property,
@@ -71,8 +77,8 @@ class PropertiesProvider with ChangeNotifier {
     return myFavs;
   }
 
-  Future<void> addProp(String state,String type, int rooms, int price, int furniture,
-      String description, List<Asset> images) async {
+  Future<void> addProp(String state, String type, int rooms, int price,
+      int furniture, String description, List<Asset> images) async {
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     final String dateString = formatter.format(now);
@@ -85,7 +91,9 @@ class PropertiesProvider with ChangeNotifier {
         furniture,
         dateString,
         getIt<LocationProvider>().addProplong,
-        getIt<LocationProvider>().addProplat, <PropertyImage>[]);
+        getIt<LocationProvider>().addProplat,
+        <PropertyImage>[],
+        description);
     int newPId = await databaseHelper.addProp(p);
     images.forEach((Asset asst) async {
       final filePath =
@@ -187,7 +195,6 @@ class PropertiesProvider with ChangeNotifier {
   Future<Marker> addSearchMarker(Property element, bool focus) async {
     Uint8List markerIcon;
     if (focus) {
-      
       markerIcon = await getBytesFromAsset('assets/images/apartment_f.png',
           (SizeConfig.blockSizeHorizontal * 46).round());
     } else {

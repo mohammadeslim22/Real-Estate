@@ -252,7 +252,7 @@ class _AddPropState extends State<AddProp> {
                     onPressed: () async {
                       if (_formKey.currentState.validate()) {
                         await propProvider.addProp(
-                            propState,
+                            propState??"للبيع",
                             type,
                             int.parse(roomsController.text),
                             int.parse(priceController.text),
