@@ -2,6 +2,8 @@ import 'dart:convert' as convert;
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:location/location.dart';
+import 'package:real_estate/helpers/functions.dart';
 import 'package:real_estate/helpers/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,11 +17,13 @@ import 'package:real_estate/helpers/service_locator.dart';
 import 'package:real_estate/models/chat_message.dart';
 import 'package:real_estate/models/property.dart';
 import 'package:real_estate/providers/location_provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class PropertiesProvider with ChangeNotifier {
   List<Property> myProps = <Property>[];
   List<Property> myFavs = <Property>[];
   List<Property> mySearch = <Property>[];
+  List<Property> mySearchWithDistnce = <Property>[];
 
   DBHelper databaseHelper = DBHelper();
   List<File> fileImageArray = [];
@@ -28,7 +32,8 @@ class PropertiesProvider with ChangeNotifier {
   List<Marker> markers = <Marker>[];
   List<Marker> favMarkers = <Marker>[];
   List<Marker> searchMarkers = <Marker>[];
-
+  double lat = config.lat;
+  double long = config.long;
   GoogleMapController mapController;
   final TextEditingController addressController = TextEditingController();
 
@@ -53,6 +58,7 @@ class PropertiesProvider with ChangeNotifier {
       int roomMin,
       int roomMax,
       int furn) async {
+    print("search with no distance");
     mySearch = await databaseHelper.searchProps(state, firstPrice, secondprice,
         timeAdded, type, roomMin, roomMax, furn);
     for (final Property property in mySearch) {
@@ -63,6 +69,44 @@ class PropertiesProvider with ChangeNotifier {
     }
     notifyListeners();
     return mySearch;
+  }
+
+  Future<List<Property>> getSearchWithDistance(
+      String state,
+      int distance,
+      int firstPrice,
+      int secondprice,
+      String timeAdded,
+      String type,
+      int roomMin,
+      int roomMax,
+      int furn) async {
+    mySearch = await databaseHelper.searchProps(state, firstPrice, secondprice,
+        timeAdded, type, roomMin, roomMax, furn);
+    // take out props not in area
+    await location.getLocation().then((LocationData value) {
+      lat = value.latitude;
+      long = value.longitude;
+    });
+    mySearch.forEach((Property element) async {
+      print("enter distance search");
+      double distanceInKM = Geolocator.distanceBetween(
+              element.latitude, element.longitude, lat, long) /
+          1000;
+      print("distance search $distance  kms  $distanceInKM");
+      if (distanceInKM <= distance) {
+        print("prop added ${element.price}");
+        mySearchWithDistnce.add(element);
+      }
+    });
+    for (final Property property in mySearchWithDistnce) {
+      await addSearchMarker(
+          property,
+          property.id ==
+              (inFocusProperty != null ? inFocusProperty.id : 99999));
+    }
+    notifyListeners();
+    return mySearchWithDistnce;
   }
 
   Future<List<Property>> getFavs() async {

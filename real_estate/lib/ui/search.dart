@@ -11,6 +11,7 @@ import 'package:real_estate/helpers/service_locator.dart';
 import 'package:real_estate/models/property.dart';
 import 'package:real_estate/providers/property_provider.dart';
 import 'package:smart_select/smart_select.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 import 'widgets/text_form_input.dart';
 
 class SearchScreenLoad extends StatelessWidget {
@@ -66,7 +67,9 @@ class _SearchScreenState extends State<SearchScreen> {
   int maxPrice = 999999;
   int roomMin = 2;
   int roomMax = 2;
+  int distanceKms = 1;
   bool furn = true;
+  bool distanceOn = true;
   DateTime selectedDate = DateTime.now();
   ButtonState state;
   Future<void> _selectDate(BuildContext context) async {
@@ -158,6 +161,42 @@ class _SearchScreenState extends State<SearchScreen> {
                       //         errorText:
                       //             showWhichErrorText ? "لخمة" : "Tomatoes"));
                     })),
+            Divider(),
+            Column(
+              children: [
+                Text("البحث في محيط ؟"),
+                Row(
+                  children: [
+                    Expanded(
+                      child: NumberPicker(
+                        value: distanceKms,
+                        minValue: 1,
+                        maxValue: 200,
+                        step: 1,
+                        itemHeight: 25,
+                        itemWidth: 50,
+                        axis: Axis.horizontal,
+                        onChanged: (value) =>
+                            setState(() => distanceKms = value),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.black26),
+                        ),
+                      ),
+                    ),
+                    Checkbox(
+                        splashRadius: 22,
+                        value: distanceOn,
+                        onChanged: (bool d) {
+                          setState(() {
+                            distanceOn = d;
+                          });
+                        })
+                  ],
+                ),
+              ],
+            ),
+
             Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -320,21 +359,39 @@ class _SearchScreenState extends State<SearchScreen> {
                     setState(() {
                       state = ButtonState.loading;
                     });
-                    List<Property> props = await getIt<PropertiesProvider>()
-                        .getSearch(
-                            widget.search,
-                            minPrice,
-                            maxPrice,
-                            selectedDate.toString(),
-                            propType,
-                            roomMin,
-                            roomMax,
-                            furn ? 1 : 0);
+                    List<Property> props;
+                    if (distanceOn) {
+                      props = await getIt<PropertiesProvider>()
+                          .getSearchWithDistance(
+                              widget.search,
+                              distanceKms,
+                              minPrice,
+                              maxPrice,
+                              selectedDate.toString(),
+                              propType,
+                              roomMin,
+                              roomMax,
+                              furn ? 1 : 0);
+                    } else {
+                      props = await getIt<PropertiesProvider>().getSearch(
+                          widget.search,
+                          minPrice,
+                          maxPrice,
+                          selectedDate.toString(),
+                          propType,
+                          roomMin,
+                          roomMax,
+                          furn ? 1 : 0);
+                    }
+
                     setState(() {
                       state = ButtonState.success;
                     });
                     Navigator.pushNamed(context, "/SearchRes",
                         arguments: <String, dynamic>{"props": props});
+                    setState(() {
+                      state = ButtonState.idle;
+                    });
                   },
                   state: state),
             ),
